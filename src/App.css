@@ -1,28 +1,53 @@
+@import url('https://fonts.googleapis.com/css?family=Dosis');
+
+
 .App {
-  text-align: center;
+	padding: 2rem;
+}
+
+.App-content {
+	font-size: 1.5rem;
+	line-height: 2rem;
+	width: 80%;
+	margin: 0 auto;
+}
+
+.App-content p {
+	margin-top: 0;
+}
+
+.important-text {
+	background-color: #fed104;
+	display: inline-block;
+	padding: 0 .5rem;
+}
+
+/*.App {
+	text-align: center;
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+	animation: App-logo-spin infinite 20s linear;
+	height: 80px;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+	background-color: #222;
+	height: 150px;
+	padding: 20px;
+	color: white;
 }
 
 .App-title {
-  font-size: 1.5em;
+	font-size: 1.5em;
 }
 
 .App-intro {
-  font-size: large;
+	font-size: large;
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
 }
+*/
