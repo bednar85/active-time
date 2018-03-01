@@ -12,14 +12,26 @@ class App extends Component {
 		}
 	}
 
+	highlightMatches() {
+		// move regex matching and set value of this.state.inputString to the replaced version here
+	}
+
+	componentWillMount() {
+		// call hightlightMatches here
+	}
+
 	render() {
 		let { inputString } = this.state
 
 		let replacedText
+		let matchIndex = 0
 		replacedText = advancedStringReplace(
 			inputString,
 			/\d+ minutes/g,
-			(match) => (<mark>{match}</mark>)
+			(match) => {
+				matchIndex++
+				return (<Match key={`match${matchIndex}`} text={match} />)
+			}
 		)
 
 		return (
@@ -33,3 +45,22 @@ class App extends Component {
 }
 
 export default App;
+
+
+class Match extends Component {
+	constructor(props) {
+		super(props)
+
+		this.state = {
+			selected: true
+		}
+	}
+
+	render() {
+		const { text } = this.props
+
+		return (
+			<mark>{text}</mark>
+		)
+	}
+}
