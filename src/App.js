@@ -9,7 +9,8 @@ class App extends Component {
 
 		this.state = {
 			inputText: `Heat the oil in a saute pan or pot and cook the pancetta until golden and crisp. Add the chicken pieces, skin-side down if possible, and sear until golden, then turn over and brown the other side. Season with salt and pepper. Splash the chicken with the white wine, and let it sizzle until it's almost all evaporated. Add the garlic, rosemary and tomatoes (crushed in the tin before hand, or break them up with your wooden spoon when in the pan). Cover and cook over moderate heat. Keep an eye on everything for the first 10 minutes, stirring when necessary, then half-cover the pan and continue cooking for a further 45 minutes or until the sauce has become dense and the chicken is tender and starting to pull away from the bone. If the sauce is looking too thick but the chicken not ready, you can add a splash of water and continue cooking. Season to taste. Meanwhile, roast the peppers in a preheated oven (200° C/390° F), turning them once or twice, until soft and charred, about 45 minutes. Remove from oven and immediately tip into a bowl. Cover the hot vegetables with cling film and let them "steam" for about 10 minutes before peeling off the skins. Discard the seeds and stems and then rip or cut the peppers into strips and add to the chicken. Cook a further 5 minutes then let the pan to sit for at least 15 minutes for the flavours to mingle (better an hour, or even overnight in the fridge for the next day). You can serve it at room temperature or reheat it over low until warm.`,
-			minutes: []
+			minutesData: [],
+			minutesSelectedValues: []
 		}
 	}
 
@@ -21,6 +22,7 @@ class App extends Component {
 		const regexMinuteValues = /\d+(?= minutes)/g
 		let minutesMatches = []
 		let minutesMatch
+		let minutesSelectedValues = []
 
 		// gather match data
 		while((minutesMatch = regexMinuteText.exec(inputText)) !== null) {
@@ -29,18 +31,32 @@ class App extends Component {
 				regexMinuteText.lastIndex++;
 			}
 
+			// get value by matching regex pattern (returns it as an array)
 			let value = minutesMatch[0].match(regexMinuteValues)
+			// convert value from string in an array to a number
+			// Note: I read on StackOverflow that using a + opperator is fastest way to convert a string to a number
+			value = +value[0]
 
 			minutesMatches.push({
 				text: minutesMatch[0],
-				value: +value[0],
+				value: value,
 				selected: true
 			})
+
+			minutesSelectedValues.push(value)
 		}
 
 		this.setState({
-			minutes: minutesMatches
+			minutesData: minutesMatches,
+			minutesSelectedValues: minutesSelectedValues
 		})
+	}
+
+	getSelectedMinutesValues = (matchData) => {
+		// filter through array of match objects if match.selected is true map/add match.value to new array
+		let minutesSelectedValues = matchData.filter(match => match.selected === true).map(match => match.value)
+
+		this.setState({ minutesSelectedValues: minutesSelectedValues })
 	}
 
 	hightlightMinutes(inputText, minutes) {
@@ -65,7 +81,7 @@ class App extends Component {
 						index={matchIndex}
 						text={match}
 						selected={minutes[matchIndex].selected}
-						onClick={currentComponent.toggleSelectedStateOfMatch.bind(this, matchIndex)}
+						handleClick={currentComponent.toggleSelectedStateOfMatch.bind(this, matchIndex)}
 					/>)
 			}
 		)
@@ -77,14 +93,16 @@ class App extends Component {
 		// console.log('toggleSelectedStateOfMatch was called')
 
 		// create var for minutes
-		let { minutes } = this.state
+		let { minutesData } = this.state
 
 		// set target match's selected status to the opposite of what it currently is
-		minutes[index].selected = !minutes[index].selected
+		minutesData[index].selected = !minutesData[index].selected
 		// console.log('minutes[index].selected: ', minutes[index].selected)
 
 		// set this.state.minutes to local minutes var
-		this.setState({ minutes: minutes })
+		this.setState({ minutesData: minutesData })
+
+		this.getSelectedMinutesValues(minutesData)
 	}
 
 	componentWillMount() {
@@ -94,10 +112,11 @@ class App extends Component {
 	}
 
 	render() {
-		// console.log(this.state.minutes)
-		let { inputText, minutes } = this.state
+		// console.log('this.state.minutesData: ', this.state.minutesData)
+		// console.log('this.state.minutesSelectedValues: ', this.state.minutesSelectedValues)
+		let { inputText, minutesData } = this.state
 
-		const highlightedText = this.hightlightMinutes(inputText, minutes)
+		const highlightedText = this.hightlightMinutes(inputText, minutesData)
 
 		return (
 			<div className="App">
@@ -119,10 +138,10 @@ class Match extends Component {
 	}
 
 	render() {
-		const { onClick, text, selected } = this.props
+		const { handleClick, text, selected } = this.props
 
 		return (
-			<mark className={ selected ? 'selected' : null } onClick={onClick}>{text}</mark>
+			<mark className={ selected ? 'selected' : null } onClick={handleClick}>{text}</mark>
 		)
 	}
 }
