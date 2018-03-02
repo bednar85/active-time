@@ -16,10 +16,16 @@
 	margin-top: 0;
 }
 
-.important-text {
-	background-color: #fed104;
+mark {
+	background-color: rgba(254,209,4,.25);
+	border: 3px solid rgba(254,209,4,1);
+	border-radius: 6px;
 	display: inline-block;
 	padding: 0 .5rem;
+}
+
+mark.selected {
+	background-color: rgba(254,209,4,1);
 }
 
 /*.App {

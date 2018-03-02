@@ -8,36 +8,101 @@ class App extends Component {
 		super(props)
 
 		this.state = {
-			inputString: `Heat the oil in a saute pan or pot and cook the pancetta until golden and crisp. Add the chicken pieces, skin-side down if possible, and sear until golden, then turn over and brown the other side. Season with salt and pepper. Splash the chicken with the white wine, and let it sizzle until it's almost all evaporated. Add the garlic, rosemary and tomatoes (crushed in the tin before hand, or break them up with your wooden spoon when in the pan). Cover and cook over moderate heat. Keep an eye on everything for the first 10 minutes, stirring when necessary, then half-cover the pan and continue cooking for a further 45 minutes or until the sauce has become dense and the chicken is tender and starting to pull away from the bone. If the sauce is looking too thick but the chicken not ready, you can add a splash of water and continue cooking. Season to taste. Meanwhile, roast the peppers in a preheated oven (200° C/390° F), turning them once or twice, until soft and charred, about 45 minutes. Remove from oven and immediately tip into a bowl. Cover the hot vegetables with cling film and let them "steam" for about 10 minutes before peeling off the skins. Discard the seeds and stems and then rip or cut the peppers into strips and add to the chicken. Cook a further 5 minutes then let the pan to sit for at least 15 minutes for the flavours to mingle (better an hour, or even overnight in the fridge for the next day). You can serve it at room temperature or reheat it over low until warm.`
+			inputText: `Heat the oil in a saute pan or pot and cook the pancetta until golden and crisp. Add the chicken pieces, skin-side down if possible, and sear until golden, then turn over and brown the other side. Season with salt and pepper. Splash the chicken with the white wine, and let it sizzle until it's almost all evaporated. Add the garlic, rosemary and tomatoes (crushed in the tin before hand, or break them up with your wooden spoon when in the pan). Cover and cook over moderate heat. Keep an eye on everything for the first 10 minutes, stirring when necessary, then half-cover the pan and continue cooking for a further 45 minutes or until the sauce has become dense and the chicken is tender and starting to pull away from the bone. If the sauce is looking too thick but the chicken not ready, you can add a splash of water and continue cooking. Season to taste. Meanwhile, roast the peppers in a preheated oven (200° C/390° F), turning them once or twice, until soft and charred, about 45 minutes. Remove from oven and immediately tip into a bowl. Cover the hot vegetables with cling film and let them "steam" for about 10 minutes before peeling off the skins. Discard the seeds and stems and then rip or cut the peppers into strips and add to the chicken. Cook a further 5 minutes then let the pan to sit for at least 15 minutes for the flavours to mingle (better an hour, or even overnight in the fridge for the next day). You can serve it at room temperature or reheat it over low until warm.`,
+			minutes: []
 		}
 	}
 
-	highlightMatches() {
-		// move regex matching and set value of this.state.inputString to the replaced version here
+	getMinutesData() {
+		let { inputText } = this.state
+		
+		// get match data
+		const regexMinuteText = /\d+ minutes/g
+		const regexMinuteValues = /\d+(?= minutes)/g
+		let minutesMatches = []
+		let minutesMatch
+
+		// gather match data
+		while((minutesMatch = regexMinuteText.exec(inputText)) !== null) {
+			// This is necessary to avoid infinite loops with zero-width matches
+			if(minutesMatch.index === regexMinuteText.lastIndex) {
+				regexMinuteText.lastIndex++;
+			}
+
+			let value = minutesMatch[0].match(regexMinuteValues)
+
+			minutesMatches.push({
+				text: minutesMatch[0],
+				value: +value[0],
+				selected: true
+			})
+		}
+
+		this.setState({
+			minutes: minutesMatches
+		})
+	}
+
+	hightlightMinutes(inputText, minutes) {
+		const currentComponent = this
+
+		// get replacedText
+		const regexMinuteText = /\d+ minutes/g
+		let replacedText
+		let matchIndex = -1
+
+		replacedText = advancedStringReplace(
+			inputText,
+			regexMinuteText,
+			(match) => {
+				matchIndex++
+				// console.log('this: ', this)
+				// console.log('matchIndex: ', matchIndex)
+				// console.log('handleClick: ', handleClick)
+				return (
+					<Match
+						key={`match${matchIndex}`}
+						index={matchIndex}
+						text={match}
+						selected={minutes[matchIndex].selected}
+						onClick={currentComponent.toggleSelectedStateOfMatch.bind(this, matchIndex)}
+					/>)
+			}
+		)
+
+		return replacedText
+	}
+
+	toggleSelectedStateOfMatch(index) {
+		// console.log('toggleSelectedStateOfMatch was called')
+
+		// create var for minutes
+		let { minutes } = this.state
+
+		// set target match's selected status to the opposite of what it currently is
+		minutes[index].selected = !minutes[index].selected
+		// console.log('minutes[index].selected: ', minutes[index].selected)
+
+		// set this.state.minutes to local minutes var
+		this.setState({ minutes: minutes })
 	}
 
 	componentWillMount() {
-		// call hightlightMatches here
+		// TODO: should make this more general so we can call it to get hours etc too
+		// TODO: also should create another method for highlighting all instances of keywords like "while"
+		this.getMinutesData()
 	}
 
 	render() {
-		let { inputString } = this.state
+		// console.log(this.state.minutes)
+		let { inputText, minutes } = this.state
 
-		let replacedText
-		let matchIndex = 0
-		replacedText = advancedStringReplace(
-			inputString,
-			/\d+ minutes/g,
-			(match) => {
-				matchIndex++
-				return (<Match key={`match${matchIndex}`} text={match} />)
-			}
-		)
+		const highlightedText = this.hightlightMinutes(inputText, minutes)
 
 		return (
 			<div className="App">
 				<div className="App-content">
-					{replacedText}
+					{highlightedText}
 				</div>
 			</div>
 		);
@@ -47,20 +112,17 @@ class App extends Component {
 export default App;
 
 
-class Match extends Component {
-	constructor(props) {
-		super(props)
 
-		this.state = {
-			selected: true
-		}
+class Match extends Component {
+	shouldComponentUpdate(nextProps) {
+		return this.props.selected !== nextProps.selected
 	}
 
 	render() {
-		const { text } = this.props
+		const { onClick, text, selected } = this.props
 
 		return (
-			<mark>{text}</mark>
+			<mark className={ selected ? 'selected' : null } onClick={onClick}>{text}</mark>
 		)
 	}
 }
