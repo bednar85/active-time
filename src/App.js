@@ -107,6 +107,14 @@ class App extends Component {
 		this.getSelectedMinutesValues(minutesData)
 	}
 
+	calculateTotalActiveTime(arr) {
+		const totalTimeInMin = arr.reduce((a, b) => a + b);
+		const hours = Math.trunc(totalTimeInMin / 60)
+		const minutes = totalTimeInMin % 60
+
+		console.log(`${hours} hours ${minutes} minutes`)
+	}
+
 	componentWillMount() {
 		// TODO: should make this more general so we can call it to get hours etc too
 		// TODO: also should create another method for highlighting all instances of keywords like "while"
