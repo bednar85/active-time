@@ -11,20 +11,17 @@ class App extends Component {
 
 		this.state = {
 			inputText: '',
-			minutesData: [],
-			minutesSelectedValues: []
+			matchData: [],
+			selectedValues: [],
+			highlightedText: '',
 		}
 	}
 
-	getMinutesData() {
-		let { inputText } = this.state
-		
-		// get match data
+	getMatchData(inputText) {	
 		const regexMinuteText = /\d+ minutes/g
 		const regexMinuteValues = /\d+(?= minutes)/g
-		let minutesMatches = []
+		let matchData = []
 		let minutesMatch
-		let minutesSelectedValues = []
 
 		// gather match data
 		while((minutesMatch = regexMinuteText.exec(inputText)) !== null) {
@@ -39,95 +36,99 @@ class App extends Component {
 			// Note: I read on StackOverflow that using a + opperator is fastest way to convert a string to a number
 			value = +value[0]
 
-			minutesMatches.push({
+			matchData.push({
 				text: minutesMatch[0],
 				value: value,
 				selected: true
 			})
-
-			minutesSelectedValues.push(value)
 		}
 
-		this.setState({
-			minutesData: minutesMatches,
-			minutesSelectedValues: minutesSelectedValues
-		})
+		return matchData
 	}
 
-	getSelectedMinutesValues = (matchData) => {
-		// filter through array of match objects if match.selected is true map/add match.value to new array
-		let minutesSelectedValues = matchData.filter(match => match.selected === true).map(match => match.value)
+	// filter through array of match objects if match.selected is true map/add match.value to new array
+	getSelectedValues = matchData => matchData.filter(match => match.selected === true).map(match => match.value)
 
-		this.setState({ minutesSelectedValues: minutesSelectedValues })
-	}
-
-	hightlightMinutes(inputText, minutes) {
+	highlightText(inputText, matchData) {
 		const currentComponent = this
+		// const { inputText, matchData } = this.state
 
 		// get replacedText
 		const regexMinuteText = /\d+ minutes/g
-		let replacedText
+		let highlightedText
 		let matchIndex = -1
 
-		replacedText = advancedStringReplace(
+		highlightedText = advancedStringReplace(
 			inputText,
 			regexMinuteText,
 			(match) => {
 				matchIndex++
-				// console.log('this: ', this)
-				// console.log('matchIndex: ', matchIndex)
-				// console.log('handleClick: ', handleClick)
 				return (
 					<Match
 						key={`match${matchIndex}`}
 						index={matchIndex}
 						text={match}
-						selected={minutes[matchIndex].selected}
-						handleClick={currentComponent.toggleSelectedStateOfMatch.bind(this, matchIndex)}
-					/>)
+						selected={matchData[matchIndex].selected}
+						handleClick={currentComponent.toggleSelectedMatch.bind(this, matchIndex)}
+					/>
+				)
 			}
 		)
 
-		return replacedText
+		return highlightedText
 	}
 
-	toggleSelectedStateOfMatch(index) {
-		// console.log('toggleSelectedStateOfMatch was called')
+	toggleSelectedMatch(index) {
+		console.log('toggleSelectedMatch was called')
+		console.log('index: ', index)
 
 		// create var for minutes
-		let { minutesData } = this.state
+		let { matchData } = this.state
 
 		// set target match's selected status to the opposite of what it currently is
-		minutesData[index].selected = !minutesData[index].selected
-		// console.log('minutes[index].selected: ', minutes[index].selected)
+		matchData[index].selected = !matchData[index].selected
+		// console.log('matchData[index].selected: ', matchData[index].selected)
 
 		// set this.state.minutes to local minutes var
-		this.setState({ minutesData: minutesData })
+		this.setState({ matchData: matchData })
 
-		this.getSelectedMinutesValues(minutesData)
+		this.getSelectedValues(matchData)
+
+		this.updateState(['selectedValues', 'highlightedText'])
 	}
 
-	calculateTotalActiveTime(arr) {
-		const totalTimeInMin = arr.reduce((a, b) => a + b);
+	calculateTotalActiveTime(selectedValues) {
+		const totalTimeInMin = selectedValues.reduce((a, b) => a + b);
 		const hours = Math.trunc(totalTimeInMin / 60)
 		const minutes = totalTimeInMin % 60
 
 		console.log(`${hours} hours ${minutes} minutes`)
 	}
 
-	componentWillMount() {
-		// TODO: should make this more general so we can call it to get hours etc too
-		// TODO: also should create another method for highlighting all instances of keywords like "while"
-		this.getMinutesData()
+	updateState(targetKeys) {
+		let newState = Object.assign({}, this.state)
+
+		if(targetKeys.includes('matchData')) {
+			newState.matchData = this.getMatchData(newState.inputText)
+		}
+		if(targetKeys.includes('selectedValues')) {
+			newState.selectedValues = this.getSelectedValues(newState.matchData)
+		}
+		if(targetKeys.includes('highlightedText')) {
+			newState.highlightedText = this.highlightText(newState.inputText, newState.matchData)
+		}
+
+		this.setState(newState)
 	}
 
 	render() {
 		console.log('this.state: ', this.state)
-		// console.log('this.state.minutesSelectedValues: ', this.state.minutesSelectedValues)
-		// let { inputText, minutesData } = this.state
+		// console.log('this.state.matchData: ', this.state.matchData)
+		// console.log('this.state.selectedValues: ', this.state.selectedValues)
+		const { inputText, highlightedText } = this.state
 
-		// const highlightedText = this.hightlightMinutes(inputText, minutesData)
-		const highlightedText = unescape(this.state.inputText)
+		// if highlightedText is defined render that otherwise render an unescaped version of inputText
+		const displayText = highlightedText.length > 0 ? highlightedText : unescape(inputText)
 
 		return (
 			<div className="App">
@@ -138,20 +139,20 @@ class App extends Component {
 								<DebounceInput
 									element="textarea"
 									debounceTimeout={1000}
-									onChange={event => this.setState({ inputText: escape(event.target.value) })}
+									onChange={event => this.setState({ inputText: event.target.value, highlightedText: '' })}
 								/>
 							</form>
 							<div className="results">
 								total time
 							</div>
 							<div className="actions">
-								<button>Parse Text</button>
-								<button onClick={this.calculateTotalActiveTime.bind(this, this.state.minutesSelectedValues)}>Calculate Time</button>
+								<button onClick={this.updateState.bind(this, ['matchData', 'selectedValues', 'highlightedText'])}>Highlight Text</button>
+								<button onClick={this.calculateTotalActiveTime.bind(this, this.state.selectedValues)}>Calculate Time</button>
 							</div>
 						</div>
 						<div className="grid-item">
 							<div className="parsed-text">
-								{highlightedText}
+								{displayText}
 							</div>
 						</div>
 					</div>
