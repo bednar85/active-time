@@ -1,0 +1,156 @@
+.App {
+	padding: 2rem;
+}
+
+.content {
+	/*font-size: 1.5rem;*/
+	/*line-height: 2rem;*/
+	width: 90%;
+	margin: 0 auto;
+}
+
+.content p {
+	margin-top: 0;
+}
+
+
+.grid {
+	display: flex;
+}
+
+.grid-item {
+	flex: 1;
+	padding: 1rem 2rem;
+	width: 50%;
+}
+
+.grid-item:first-child {
+	padding-left: 0;
+}
+
+.grid-item:last-child {
+	padding-right: 0;
+}
+
+.grid-item:not(:last-child) {
+	border-right: 1px dashed rgba(0,0,0,.33);
+}
+
+
+.instructions {
+	margin-bottom: 2rem;
+}
+
+/*.instructions__header {}*/
+
+.instructions__header h1 {
+	margin-bottom: 0;
+}
+
+.instructions__header h2 {
+	font-style: italic;
+	font-weight: normal;
+}
+
+textarea {
+	width: 100%;
+	resize: vertical;
+	max-height: 600px;
+	min-height: 300px;
+}
+
+
+
+.calculated-total-time {
+	background-color: rgba(33,186,69,.25);
+	border-radius: .6rem;
+	color: rgb(33,186,69);
+	font-size: 1.5rem;
+	margin: 2rem 0;
+	padding: 2rem;
+	text-align: center;
+}
+
+
+/*.input-and-data {}*/
+
+
+/*.textarea {
+	font-size: .85rem;
+	line-height: 1.33rem;
+}*/
+
+.input-text {
+	margin-bottom: 1rem;
+}
+
+.parsed-display-text {
+	/*font-family: 'Dosis', sans-serif;*/
+	/*font-size: 1.25rem;*/
+	/*line-height: 2.25rem;*/
+	font-size: 1rem;
+	line-height: 2rem;
+	word-wrap: break-word;
+}
+
+/*.results {}*/
+/*.actions {}*/
+
+
+mark {
+	background-color: rgba(224,225,226,1); /* gray */
+	border: 2px solid transparent;
+	border-radius: .28571429rem;
+	display: inline-block;
+	padding: 0 .5rem;
+}
+
+mark.selectable {
+	background-color: rgba(254,209,4,.25); /* light yellow */
+	border-color: rgba(254,209,4,1); /* yellow */
+	cursor: pointer;
+}
+
+mark.selectable--selected {
+	background-color: rgba(254,209,4,1); /* yellow */
+}
+
+mark.almost-time-match {
+	background-color: rgba(219,40,40,.33); /* light red */
+}
+mark.keyword {
+	background-color: rgba(33,186,69,.33); /* light green */
+}
+
+
+
+
+/*.App {
+	text-align: center;
+}
+
+.App-logo {
+	animation: App-logo-spin infinite 20s linear;
+	height: 80px;
+}
+
+.App-header {
+	background-color: #222;
+	height: 150px;
+	padding: 20px;
+	color: white;
+}
+
+.App-title {
+	font-size: 1.5em;
+}
+
+.App-intro {
+	font-size: large;
+}
+
+@keyframes App-logo-spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+*/
