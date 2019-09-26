@@ -1,19 +1,34 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 class Match extends Component {
-	shouldComponentUpdate(nextProps) {
-		return this.props.selected !== nextProps.selected
-	}
+  static propTypes = {
+    handleClick: PropTypes.func.isRequired,
+    selected: PropTypes.bool.isRequired,
+    text: PropTypes.string.isRequired
+  };
 
-	render() {
-		const { handleClick, text, selected } = this.props
+  shouldComponentUpdate(nextProps) {
+    const { selected } = this.props;
 
-		return (
-			<mark className={classNames('time-match', 'selectable', { 'selectable--selected': selected })} onClick={handleClick}>{text}</mark>
-		)
-	}
+    return selected !== nextProps.selected;
+  }
+
+  render() {
+    const { handleClick, text, selected } = this.props;
+
+    return (
+      <mark
+        className={classNames('time-match', 'selectable', {
+          'selectable--selected': selected
+        })}
+        onClick={handleClick}
+      >
+        {text}
+      </mark>
+    );
+  }
 }
 
 export default Match;
