@@ -1,0 +1,21 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["airbnb", "prettier"],
+  "env": {
+    "es6": true,
+    "browser": true,
+    "node": true
+  },
+  "plugins": ["prettier"],
+  "rules": {
+    "arrow-parens": 0,
+    "comma-dangle": 0,
+    "import/no-named-as-default": 0,
+    "max-len": ["error", 150],
+    "no-mixed-operators": 0,
+    "prettier/prettier": ["error", { "singleQuote": true }],
+    "react/forbid-prop-types": 0,
+    "react/jsx-one-expression-per-line": 0,
+    "react/static-property-placement": 0
+  }
+}
